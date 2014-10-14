@@ -1,9 +1,8 @@
 Frage 1:
-
 Da es für bash builtin commands keine extra manpage gibt
 
 Frage 2:
-Das .tar verzeichnis ist größer/gleich der enthaltenen Dateien,
+Das .tar verzeichnis ist minimal größer der enthaltenen Dateien,
 es hat keine komprimierung stattgefunden. Es wurde lediglich ein 
 Container erzeugt und das Verzeichnis und dessen Inhalt abgelegt.
 
