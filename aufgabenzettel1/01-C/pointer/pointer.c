@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+// Abgabe: Harms, Feil, Floste
+
 void basic_pointer (int x)
 {
 	int* adresse_von_x;
