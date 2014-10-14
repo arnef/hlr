@@ -1,6 +1,4 @@
-1)
 
-2)
-Antwort zur Frage:
+Antwort zur Frage 1:
 
 Da es für bashbuiltin commands keine extra manpage gibt
