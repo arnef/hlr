@@ -1,4 +1,8 @@
+Frage 1:
 
-Antwort zur Frage 1:
+Da es für bash builtin commands keine extra manpage gibt
 
-Da es für bashbuiltin commands keine extra manpage gibt
+Frage 2:
+tar -czf testarchiv.tar.gz testarchiv
+
+Frage 3:
