@@ -1,23 +1,78 @@
 #include <stdio.h>
 
 // Definieren Sie ein enum cardd
-
+typedef enum { N = 1, E=2, S=4, W=8 } cardd;
 
 // Definieren Sie ein 3x3-Array namens map, das Werte vom Typ cardd enthält
-
+static cardd map[3][3] = {
+	{-1, -1, -1 },
+	{-1, -1, -1 },
+	{-1, -1, -1}
+};
 
 // Die Funktion set_dir soll an Position x, y den Wert dir in das Array map eintragen
 // Überprüfen Sie x und y um mögliche Arrayüberläufe zu verhindern
 // Überprüfen Sie außerdem dir auf Gültigkeit
 void set_dir (int x, int y, cardd dir)
 {
-
+	//TODO gültigkeit von dir
+	if (x < 3 && y < 3) {
+		map[x][y] = dir;
+	}
 }
 
 // Die Funktion show_map soll das Array in Form einer 3x3-Matrix ausgeben
 void show_map (void)
 {
-
+	int i,j;
+	// zeilen
+	for (i = 0; i < 3; ++i) {
+		// spalten
+		for (j = 0; j < 3; ++j) {
+			switch (map[i][j]) {
+				case N: 
+					printf("N");
+					break;
+				case E: 
+					printf("E");
+					break;
+				case W: 
+					printf("W");
+					break;
+				case S: 
+					printf("S");
+					break;
+				case 9:
+					printf("NW");
+					break;
+				case 3:
+					printf("NE");
+					break;
+				case 5:
+					printf("NE");
+					break;
+				case 12:
+					printf("SW");
+					break;
+				case 6:
+					printf("SE");
+					break;
+				case 10:
+					printf("EW");
+					break;
+				default: 
+					printf("0");
+					break;
+			}
+			if (i % 2 == 0) {
+				printf("  ");
+			}
+			else {
+				printf("   ");
+			}
+		}
+		printf("\n");
+	}
 }
 
 int main (void)
