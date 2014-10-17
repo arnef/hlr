@@ -5,9 +5,9 @@ typedef enum { N = 1, E=2, S=4, W=8 } cardd;
 
 // Definieren Sie ein 3x3-Array namens map, das Werte vom Typ cardd enthält
 static cardd map[3][3] = {
-	{-1, -1, -1 },
-	{-1, -1, -1 },
-	{-1, -1, -1}
+	{0, 0, 0 },
+	{0, 0, 0 },
+	{0, 0, 0 }
 };
 
 // Die Funktion set_dir soll an Position x, y den Wert dir in das Array map eintragen
@@ -15,8 +15,12 @@ static cardd map[3][3] = {
 // Überprüfen Sie außerdem dir auf Gültigkeit
 void set_dir (int x, int y, cardd dir)
 {
-	//TODO gültigkeit von dir
-	if (x < 3 && y < 3) {
+	if (x >= 0 && x < 3 &&        // x innerhalb des Arrays
+		y >= 0 && y < 3 &&        // y innerhalb des Arrays
+		!(dir & ~(N|E|S|W)) &&    // Richtungen dürfen nur aus N,S,E,W bestehen
+		(dir & (N|S)) != (N|S) && // Norden darf nicht mit Süden kombiniert vorkommen
+		(dir & (E|W)) != (E|W))   //Osten darf nicht mit Westen kombiniert vorkommen
+	{ 
 		map[x][y] = dir;
 	}
 }
@@ -42,23 +46,17 @@ void show_map (void)
 				case S: 
 					printf("S");
 					break;
-				case 9:
+				case (N|W):
 					printf("NW");
 					break;
-				case 3:
+				case (N|E):
 					printf("NE");
 					break;
-				case 5:
-					printf("NE");
-					break;
-				case 12:
+				case (S|W):
 					printf("SW");
 					break;
-				case 6:
+				case (S|E):
 					printf("SE");
-					break;
-				case 10:
-					printf("EW");
 					break;
 				default: 
 					printf("0");

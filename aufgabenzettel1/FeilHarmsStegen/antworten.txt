@@ -1,10 +1,12 @@
-Frage 1:
-Da es für bash builtin commands keine extra manpage gibt
+Aufgabe 1 Cluster-Kennung (30 Punkte)
 
-Frage 2:
-Das .tar verzeichnis ist minimal größer der enthaltenen Dateien,
-es hat keine komprimierung stattgefunden. Es wurde lediglich ein 
-Container erzeugt und das Verzeichnis und dessen Inhalt abgelegt.
+Frage: Warum gibt es keine Manual-Page zum Kommando cd?
+Da es für die direkt in bash eingbauten commands keine eigene manpage gibt
 
-Frage 3:
+Frage: Was fällt Ihnen auf?
+Das .tar ist ein wenig größer als die enthaltenen Dateien,
+es hat also keine komprimierung stattgefunden. Es wurde lediglich ein 
+Container erzeugt, welcher das Verzeichnis und dessen Inhalt enthält.
+
+Frage: Frage: Ist es möglich, ein gepacktes Archiv (.tar.gz) mit einem Aufruf von tar zu erzeugen?
 tar -czf testarchiv.tar.gz testarchiv
