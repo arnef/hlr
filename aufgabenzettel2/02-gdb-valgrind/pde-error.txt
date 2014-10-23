@@ -1,0 +1,17 @@
+Zeile 78:
+Matrix = (double ***) calloc (2, sizeof (double **));  /* allocate
+                                                                memory     */
+
+Fehler:
+Matrix allokiert nur den Platz für ein double im Speicher obwohl für 2
+allokiert werden müsste
+
+Zeile 96:
+M = malloc (sizeof (double) * (N + 1) * (N - 1) * 2); /* allocate memory */
+
+Fehler:
+es soll Speicher für eine N*N Matrix allokiert werden (mit 0 als anfang) das
+entspricht einer in unserem Fall einer Speichergröße von:
+' sizeof (double) * (N+1) * (N+1) * 2
+
+
