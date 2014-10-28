@@ -1,0 +1,51 @@
+1. Was bedeutet der Begriff Batch-Queuing? Welche Aufgaben hat ein Batch-Queuing-System?
+	Der Begriff Batch kommt ursprünglich von Lochkarten-Stapeln, heute wird er
+	allerdings generell für nicht interaktive Datenverarbeitung verwendet.
+	Batch-Queueing bedeutet also mehrere aufgaben, welche keine Inkeraktion erfordern
+	automatisch nacheinander ausführen zu lassen.
+	
+	Ein Batch-Queuing-System verwaltet die Arbeitsaufträge und führt diese aus,
+	sobald die dafür benötigten Ressourcen zur Verfügung stehen. Es ermöglicht
+	mehrere Rechner von einem einzelnen interaktiven Arbeitsplatz zu steuern.
+
+2. Nennen Sie drei Beispiele für Batch-Queuing-Systeme.
+	TODO
+
+3. Machen Sie sich mit der Manpage von sbatch vertraut.
+4. Welches Batch-Queuing-System wird auf dem Cluster verwendet?
+	TODO
+
+5. Wie lassen sich die aktuellen Jobs und deren Status anzeigen?
+	TODO
+
+6. Machen Sie sich mit dem Befehl sview vertraut.
+   Beschreiben Sie die wichtigsten Vorteile gegenüber dem vorigen Punkt.
+	TODO
+
+7. Gibt es eine Möglichkeit, einen bereits abgeschickten Job zu löschen
+   (bevor oder währender läuft)? Wenn ja, wie?
+	TODO
+
+8. Können auf dem Cluster mehrere Nutzer oder Jobs gleichzeitig denselben Knoten benutzen?
+	TODO
+
+9. Finden Sie heraus wie Sie sich den detaillierten Status eines Jobs ausgeben lassen können.
+	TODO
+
+10. Welche Scheduling-Verfahren sind bei dem auf dem Cluster benutzten
+    System möglich? Welches wird benutzt?
+	TODO
+
+11. Finden Sie heraus, wie Sie einen einzelnen Knoten allokieren können.
+    Allokieren Sie einen konkreten Knoten (z. B. west7), bauen Sie eine Verbindung
+    zu diesem Knoten auf und führen sie hostname darauf aus.
+	Ausgabe: 
+
+12. Wie hoch ist das Timeout auf dem Cluster, bis alle Knoten wieder freigegeben werden?
+	TODO
+
+13. Wie können Sie die Priorität ihrer Jobs nachschauen? Können Sie diese verändern oder beeinflussen?
+	TODO
+
+14. Welche unterschiedlichen Partitionen sind auf dem Cluster eingerichtet? Wie kann eine andere
+    als die Standardpartition benutzt werden?
