@@ -1,3 +1,2 @@
 #!/bin/bash
-TIMESTAMP=$(date +%s%3N)
 echo $(hostname):$(date +'%D %T.%3N') 
