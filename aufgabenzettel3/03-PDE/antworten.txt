@@ -59,7 +59,8 @@
 	6std
 
 13. Wie können Sie die Priorität ihrer Jobs nachschauen? Können Sie diese verändern oder beeinflussen?
-	Mit 'squeue -o '%A %Q' -u [username]' kann die priorität des jeweiligen users
+sprio -ufeil
+Mit 'squeue -o '%A %Q' -u [username]' kann die priorität des jeweiligen users
   nachgeschaut werden nachgeschaut werden. mit 'scontrol update jobid=1234
   priority=1000000' kann diese theoretisch
   beieinflusst werden. Aber das muss ein admin machen, damit das nicht jeder
