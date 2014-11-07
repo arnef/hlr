@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+#SBATCH --job-name=timestamp
+#SBATCH --output=timescript.out
+#
+#SBATCH --ntasks=4
+#SBATCH --nodes=4
+
+srun ./timestamp
+
