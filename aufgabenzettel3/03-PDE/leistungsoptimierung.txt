@@ -1,0 +1,17 @@
+time erstes mal laufen lassen (keine änderungen)
+Berechnungszeit:    61.332091 s 
+
+flag -O1
+Berechnungszeit:    36.559665 s 
+
+flag -O2
+Berechnungszeit:    31.697200 s 
+
+flag -O3
+Berechnungszeit:    21.102437 s 
+
+schleifen umdrehen cache-misses
+line 228 231
+
+residuum nicht doppelt korrektur schreiben
+line 236 235
