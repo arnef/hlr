@@ -2,8 +2,8 @@
 CC = gcc
 
 # Compiler flags, paths and libraries
-CFLAGS = -std=c99 -pedantic -Wall -Wextra
-LFLAGS = $(CFLAGS) -pg
+CFLAGS = -std=c99 -pedantic -Wall -Wextra -pg -O3 
+LFLAGS = $(CFLAGS) 
 LIBS   = -lm
 
 OBJS = partdiff-seq.o askparams.o displaymatrix.o
