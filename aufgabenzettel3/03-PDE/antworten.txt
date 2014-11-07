@@ -1,7 +1,7 @@
 1. Was bedeutet der Begriff Batch-Queuing? Welche Aufgaben hat ein Batch-Queuing-System?
 	Der Begriff Batch kommt ursprünglich von Lochkarten-Stapeln, heute wird er
 	allerdings generell für nicht interaktive Datenverarbeitung verwendet.
-	Batch-Queueing bedeutet also mehrere aufgaben, welche keine Inkeraktion erfordern
+	Batch-Queueing bedeutet also mehrere aufgaben, welche keine Interaktion erfordern
 	automatisch nacheinander ausführen zu lassen.
 	
 	Ein Batch-Queuing-System verwaltet die Arbeitsaufträge und führt diese aus,
@@ -9,32 +9,40 @@
 	mehrere Rechner von einem einzelnen interaktiven Arbeitsplatz zu steuern.
 
 2. Nennen Sie drei Beispiele für Batch-Queuing-Systeme.
-	TODO
+	* Moab
+  * Argent Job Scheduler®
+  * Univa Grid Engine 
+  (quelle: http://en.wikipedia.org/wiki/Job_scheduler#Batch_queuing_for_HPC_clusters)
+
 
 3. Machen Sie sich mit der Manpage von sbatch vertraut.
 4. Welches Batch-Queuing-System wird auf dem Cluster verwendet?
-	TODO
+	* SLURM (Simple Linux Utility for Resource Management)
 
 5. Wie lassen sich die aktuellen Jobs und deren Status anzeigen?
-	TODO
-
+	* 'squeue' oder 'smap'
+  
 6. Machen Sie sich mit dem Befehl sview vertraut.
    Beschreiben Sie die wichtigsten Vorteile gegenüber dem vorigen Punkt.
-	TODO
+	'sview' is im gegensatz zu 'squeue' grafisch und kann die queue durch
+  klicken  manipulieren
 
 7. Gibt es eine Möglichkeit, einen bereits abgeschickten Job zu löschen
    (bevor oder währender läuft)? Wenn ja, wie?
-	TODO
+	Ja, 'scancel [jobid]'
 
 8. Können auf dem Cluster mehrere Nutzer oder Jobs gleichzeitig denselben Knoten benutzen?
-	TODO
+	Nein, aber man kann seinen Job in die Queue packen, damit dieser ausgeführt
+  wird, wenn die anderen fertig sein.
 
 9. Finden Sie heraus wie Sie sich den detaillierten Status eines Jobs ausgeben lassen können.
-	TODO
+	man kann einerseits in 'sview' mit rechtsklick auf den job klicken und sich
+  die infos anzeigen lassen. andererseits geht dies auch in der shell mit
+  'scontrol show job [jobid]'
 
 10. Welche Scheduling-Verfahren sind bei dem auf dem Cluster benutzten
     System möglich? Welches wird benutzt?
-	TODO
+  TODO
 
 11. Finden Sie heraus, wie Sie einen einzelnen Knoten allokieren können.
     Allokieren Sie einen konkreten Knoten (z. B. west7), bauen Sie eine Verbindung
