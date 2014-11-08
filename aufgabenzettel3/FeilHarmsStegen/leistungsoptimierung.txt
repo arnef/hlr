@@ -1,0 +1,25 @@
+time erstes mal laufen lassen (keine änderungen)
+Berechnungszeit:    61.332091 s 
+
+flag -O1
+Berechnungszeit:    36.559665 s 
+
+flag -O2
+Berechnungszeit:    31.697200 s 
+
+flag -O3
+Berechnungszeit:    21.102437 s 
+
+
+line 228 231
+Schleifen in der Reihenfolge durchlaufen, wie Speicher allokiert wurde.
+Weniger Cache-Misses
+
+line 236 235
+Unnötige Zuweisung
+residuum = getResiduum(arguments, options, i, j, star);
+korrektur = residuum;
+residuum = (residuum < 0) ? -residuum : residuum;
+kürzer:
+korrektur = getResiduum(arguments, options, i, j, star);
+residuum = (korrektur < 0) ? -korrektur : korrektur;
