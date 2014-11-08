@@ -1,3 +1,0 @@
-#!/bin/bash
-#echo $(time ./partdiff-seq 1 2 128 1 2 1024)
-./partdiff-seq 1 2 128 1 2 1024 

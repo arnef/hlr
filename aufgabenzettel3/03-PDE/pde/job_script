@@ -1,7 +1,0 @@
-#!/bin/bash
-#
-#SBATCH --job-name=opt
-#SBATCH --output=opt.out
-#
-
-srun ./time-part

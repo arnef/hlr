@@ -1,2 +1,0 @@
-#!/bin/bash
-echo $(hostname):$(date +'%D %T.%3N') 
