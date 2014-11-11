@@ -1,0 +1,5 @@
+#!/bin/bash
+# abbruch nach interationen
+srun --output=thread"$1".out time ./partdiff-seq "$1" 2 512 2 2 128
+# abbruch nach fehler
+#srun --output=thread_fehler"$1".out time ./partdiff-seq "$1" 2 512 2 1 2.9298e-7

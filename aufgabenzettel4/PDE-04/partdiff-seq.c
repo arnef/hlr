@@ -145,8 +145,8 @@ initMatrices (struct calculation_arguments* arguments, struct options const* opt
 	uint64_t const N = arguments->N;
 	double const h = arguments->h;
 	double*** Matrix = arguments->Matrix;
-	
-    /* initialize matrix/matrices with zeros */
+
+	/* initialize matrix/matrices with zeros */
 	for (g = 0; g < arguments->num_matrices; g++)
 	{
 		for (i = 0; i <= N; i++)
@@ -198,7 +198,7 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 
 	int term_iteration = options->term_iteration;
 
-    /* initialize m1 and m2 depending on algorithm */
+	/* initialize m1 and m2 depending on algorithm */
 	if (options->method == METH_JACOBI)
 	{
 		m1 = 0;
@@ -224,9 +224,7 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		maxresiduum = 0;
 
 		/* over all rows */
-        omp_set_num_threads(options->number);
-        #pragma omp parallel for private(i, j, star)  
-        for (i = 1; i < N; i++)
+		for (i = 1; i < N; i++)
 		{
 			double fpisin_i = 0.0;
 
