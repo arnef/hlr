@@ -2,4 +2,6 @@
 # abbruch nach interationen
 #srun --output=thread"$1".out time ./partdiff-seq "$1" 2 512 2 2 128
 # abbruch nach fehler
-srun --output=thread_fehler"$1".out time ./partdiff-seq "$1" 2 512 2 1 2.9298e-7
+#srun --output=thread_fehler"$1".out time ./partdiff-seq "$1" 2 512 2 1 2.9298e-7
+#messung 2
+srun --output=messung"$1".out time ./partdiff-seq 12 2 "$1" 2 2 17140 
