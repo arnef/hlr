@@ -222,6 +222,7 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		double** Matrix_In  = arguments->Matrix[m2];
 		maxresiduum = 0;
 		/* over all rows */
+        omp_set_num_threads(options->number);
         #pragma omp parallel for private(i, j, star, residuum) reduction(max:maxresiduum)     
         for (i = 1; i < N; i++)
 		{

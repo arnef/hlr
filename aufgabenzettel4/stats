@@ -21,3 +21,10 @@ fehler ipt  2.9298e-7       -       -
 iterations  136             -       -
 fehler      2.929799e-7     -       -
 time        95.89           177.99  150.89 // da muss was falsch sein bei der parallelisierung
+    // fehler beim maxresdiuum zuweisen prozesse haben zeitgleich drauf zugegriffen: behoben durch reduction(max:)
+
+threads     1               2       3       4       5       6       7       8       9       10      11      12
+fehler ipt  2.9298e-7       -       -       -       -       -       -       -       -       -       -       -
+interations 136             -       -       -       -       -       -       -       -       -       -       -
+fehler      2.929799-e7     -       -       -       -       -       -       -       -       -       -       -
+time        91.44           46.04   30.61   23.01   18.59   15.38   13.17   11.60   10.32   9.39    8.49    7.89
