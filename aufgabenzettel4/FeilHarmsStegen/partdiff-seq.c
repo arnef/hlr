@@ -220,12 +220,9 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 	{
 		double** Matrix_Out = arguments->Matrix[m1];
 		double** Matrix_In  = arguments->Matrix[m2];
-
 		maxresiduum = 0;
-
 		/* over all rows */
-        omp_set_num_threads(options->number);
-        #pragma omp parallel for private(i, j, star)  
+        #pragma omp parallel for private(i, j, star, residuum) reduction(max:maxresiduum)     
         for (i = 1; i < N; i++)
 		{
 			double fpisin_i = 0.0;
@@ -249,7 +246,7 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 				{
 					residuum = Matrix_In[i][j] - star;
 					residuum = (residuum < 0) ? -residuum : residuum;
-					maxresiduum = (residuum < maxresiduum) ? maxresiduum : residuum;
+                    maxresiduum = (residuum < maxresiduum) ? maxresiduum : residuum;
 				}
 
 				Matrix_Out[i][j] = star;
