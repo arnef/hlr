@@ -1,0 +1,29 @@
+============================================================
+Program for calculation of partial differential equations.  
+============================================================
+(c) Dr. Thomas Ludwig, TU München.
+    Thomas A. Zochler, TU München.
+    Andreas C. Schmidt, TU München.
+============================================================
+
+Berechnungszeit:    3781.245975 s 
+Speicherbedarf:     1026.251236 MiB
+Berechnungsmethode: Jacobi
+Interlines:         1024
+Stoerfunktion:      f(x,y) = 2pi^2*sin(pi*x)sin(pi*y)
+Terminierung:       Anzahl der Iterationen
+Anzahl Iterationen: 18000
+Norm des Fehlers:   7.329399e-08
+
+Matrix:
+ 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000
+ 0.0000 0.0002 0.0004 0.0005 0.0005 0.0005 0.0004 0.0002 0.0000
+ 0.0000 0.0004 0.0007 0.0009 0.0009 0.0009 0.0007 0.0004 0.0000
+ 0.0000 0.0005 0.0009 0.0011 0.0012 0.0011 0.0009 0.0005 0.0000
+ 0.0000 0.0005 0.0009 0.0012 0.0013 0.0012 0.0009 0.0005 0.0000
+ 0.0000 0.0005 0.0009 0.0011 0.0012 0.0011 0.0009 0.0005 0.0000
+ 0.0000 0.0004 0.0007 0.0009 0.0009 0.0009 0.0007 0.0004 0.0000
+ 0.0000 0.0002 0.0004 0.0005 0.0005 0.0005 0.0004 0.0002 0.0000
+ 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000
+45117.88user 29.08system 1:03:01elapsed 1193%CPU (0avgtext+0avgdata 4207760maxresident)k
+0inputs+0outputs (0major+3463746minor)pagefaults 0swaps
