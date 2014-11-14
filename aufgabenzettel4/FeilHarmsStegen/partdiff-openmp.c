@@ -27,7 +27,7 @@
 #include <malloc.h>
 #include <sys/time.h>
 
-#include "partdiff-seq.h"
+#include "partdiff-openmp.h"
 
 struct calculation_arguments
 {
@@ -216,13 +216,16 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		fpisin = 0.25 * TWO_PI_SQUARE * h * h;
 	}
 
+    // anzahl der threads für die parallelisierung setzen:
+    omp_set_num_threads(options->number);
+
 	while (term_iteration > 0)
 	{
 		double** Matrix_Out = arguments->Matrix[m1];
 		double** Matrix_In  = arguments->Matrix[m2];
 		maxresiduum = 0;
 		/* over all rows */
-        omp_set_num_threads(options->number);
+        // parallelisierung
         #pragma omp parallel for private(i, j, star, residuum) reduction(max:maxresiduum)     
         for (i = 1; i < N; i++)
 		{
