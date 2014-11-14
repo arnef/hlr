@@ -1,0 +1,17 @@
+messung1_1.out:^t0.123132 s 
+messung1_2.out:^t0.114185 s 
+messung1_3.out:^t0.119567 s 
+messung1_referenz:^t638.985176 s 
+messung1_threads10.out:^t62.597979 s 
+messung1_threads11.out:^t56.903675 s 
+messung1_threads12.out:^t52.189293 s 
+messung1_threads1.out:^t637.977833 s 
+messung1_threads2.out:^t314.021338 s 
+messung1_threads3.out:^t208.590788 s 
+messung1_threads4.out:^t156.738150 s 
+messung1_threads5.out:^t127.185749 s 
+messung1_threads6.out:^t104.164874 s 
+messung1_threads7.out:^t89.464539 s 
+messung1_threads8.out:^t78.170485 s 
+messung1_threads9.out:^t69.594389 s 
+
