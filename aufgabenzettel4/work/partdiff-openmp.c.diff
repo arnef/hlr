@@ -1,0 +1,32 @@
+30c30
+< #include "partdiff-openmp.h"
+---
+> #include "partdiff-seq.h"
+148,149c148,149
+< 	
+<     /* initialize matrix/matrices with zeros */
+---
+> 
+> 	/* initialize matrix/matrices with zeros */
+201c201
+<     /* initialize m1 and m2 depending on algorithm */
+---
+> 	/* initialize m1 and m2 depending on algorithm */
+219,221d218
+<     // anzahl der threads für die parallelisierung setzen:
+<     omp_set_num_threads(options->number);
+< 
+225a223
+> 
+226a225
+> 
+228,230c227
+<         // parallelisierung
+<         #pragma omp parallel for private(i, j, star, residuum) reduction(max:maxresiduum)     
+<         for (i = 1; i < N; i++)
+---
+> 		for (i = 1; i < N; i++)
+253c250
+<                     maxresiduum = (residuum < maxresiduum) ? maxresiduum : residuum;
+---
+> 					maxresiduum = (residuum < maxresiduum) ? maxresiduum : residuum;
