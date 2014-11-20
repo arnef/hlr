@@ -1,0 +1,59 @@
+(gdb) break mistake1
+Breakpoint 1 at 0x4005b0: file simple.c, line 12.
+(gdb) run
+Starting program: /home/stegen/git/hlr/aufgabenzettel2/02-gdb-valgrind/simple/simple
+warning: no loadable sections found in added symbol-file system-supplied DSO at 0x7ffff7ffa000
+
+Breakpoint 1, mistake1 () at simple.c:12
+12        int buf[] = { 1, 1, 2, 3, 4, 5 };
+(gdb) print buf
+$1 = {-140333504, 32767, 4195393, 0, 1, 0}
+(gdb) print buf[2]
+$2 = 4195393
+(gdb) step
+13        return buf;
+(gdb) print buf
+$3 = {1, 1, 2, 3, 4, 5}
+(gdb) print buf[2]
+$4 = 2
+(gdb) ptype buf
+type = int [6]
+(gdb) break mistake2
+Breakpoint 2 at 0x4005e8: file simple.c, line 19.
+(gdb) continue
+Continuing.
+
+Breakpoint 2, mistake2 () at simple.c:19
+19        int *buf = malloc (sizeof (char) * 4);
+(gdb) ptype buf
+type = int *
+(gdb) continue
+Continuing.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000000000400621 in mistake3 () at simple.c:29
+29        buf[0] = 3;
+(gdb) list
+24      int *
+25      mistake3 ()
+26      {
+27        int mistake2_ = 0;
+28        int *buf = (int *) &mistake2;
+29        buf[0] = 3;
+30        return buf;
+31      }
+32
+33      int *
+(gdb) bt
+#0  0x0000000000400621 in mistake3 () at simple.c:29
+#1  0x0000000000400699 in main () at simple.c:46
+(gdb) frame 1
+#1  0x0000000000400699 in main () at simple.c:46
+46        int *p[4] = { &mistake1 ()[1], &mistake2 ()[1], mistake3 (), mistake4 () };
+(gdb) print p
+$5 = {0x7fffffffe064, 0x602014, 0x7fffffffe190, 0x0}
+(gdb) call mistake4()
+$6 = (int *) 0x602030
+(gdb) print $6[4]
+$7 = 4
+
