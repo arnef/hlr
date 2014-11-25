@@ -1,0 +1,2 @@
+#!/bin/bash
+srun --output=seq2.out ./partdiff-seq 1 2 512 2 2 1000
