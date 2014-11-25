@@ -1,13 +1,14 @@
 #!/bin/bash
-srun --output=thread1.out ./partdiff-posix 1 2 512 2 2 1000
-srun --output=thread2.out ./partdiff-posix 2 2 512 2 2 1000
-srun --output=thread3.out ./partdiff-posix 3 2 512 2 2 1000
-srun --output=thread4.out ./partdiff-posix 4 2 512 2 2 1000
-srun --output=thread5.out ./partdiff-posix 5 2 512 2 2 1000
-srun --output=thread6.out ./partdiff-posix 6 2 512 2 2 1000
-srun --output=thread7.out ./partdiff-posix 7 2 512 2 2 1000
-srun --output=thread8.out ./partdiff-posix 8 2 512 2 2 1000
-srun --output=thread9.out ./partdiff-posix 9 2 512 2 2 1000
-srun --output=thread10.out ./partdiff-posix 10 2 512 2 2 1000
-srun --output=thread11.out ./partdiff-posix 11 2 512 2 2 1000
-srun --output=thread12.out ./partdiff-posix 12 2 512 2 2 1000
+#srun --output=thread1.out ./partdiff-posix 1 2 512 2 2 1000
+#srun --output=thread2.out ./partdiff-posix 2 2 512 2 2 1000
+#srun --output=thread3.out ./partdiff-posix 3 2 512 2 2 1000
+#srun --output=thread4.out ./partdiff-posix 4 2 512 2 2 1000
+#srun --output=thread5.out ./partdiff-posix 5 2 512 2 2 1000
+#srun --output=thread6.out ./partdiff-posix 6 2 512 2 2 1000
+#srun --output=thread7.out ./partdiff-posix 7 2 512 2 2 1000
+#srun --output=thread8.out ./partdiff-posix 8 2 512 2 2 1000
+#srun --output=thread9.out ./partdiff-posix 9 2 512 2 2 1000
+#srun --output=thread10.out ./partdiff-posix 10 2 512 2 2 1000
+#srun --output=thread11.out ./partdiff-posix 11 2 512 2 2 1000
+#srun --output=thread12.out ./partdiff-posix 12 2 512 2 2 1000
+srun --output=thread24.out ./partdiff-posix 24 2 512 2 2 1000
