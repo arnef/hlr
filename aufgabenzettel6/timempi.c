@@ -4,7 +4,7 @@
 #include <time.h>
 #include <mpi.h>
 
-void get_host_timestamp() {
+void get_host_timestamp(char *time_stamp) {
     char hostname[128];
     gethostname(hostname, sizeof hostname);
 
@@ -16,7 +16,7 @@ void get_host_timestamp() {
     ptm = localtime(&time.tv_sec);
     strftime(time_string, sizeof(time_string), "%Y-%m-%d %H:%M:%S", ptm);
     
-    printf( "%s: %s.%d\n", hostname, time_string, (int) time.tv_usec);
+    sprintf(time_stamp, "%s: %s.%d", hostname, time_string, (int) time.tv_usec);
 }
 
 int main (int argc, char** argv) {
@@ -42,7 +42,7 @@ int main (int argc, char** argv) {
     }
     else {
         to = 0;
-        sprintf(message, "message"); //TODO timestamp übergeben 
+        get_host_timestamp(message);
         MPI_Send (message, strlen(message), MPI_CHAR, to, 0, MPI_COMM_WORLD);
     }
     MPI_Barrier(MPI_COMM_WORLD); 
