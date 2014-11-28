@@ -1,18 +1,13 @@
-SRC = timempi.c timempi2.c
-
 all: timempi timempi2
 
-timempi: timempi.o
-	mpicc -o timempi timempi.o 
+timempi:
+	mpicc -g timempi.c -o timempi 
 
-timempi2: timempi2.o
-	mpicc -o timempi2 timempi2.o
-
-%.o: %.c
-	mpicc -g -c $(SRC)
+timempi2: 
+	mpicc -g timempi2.c -o timempi2
 
 
 clean:
-	rm -f timempi timempi
+	rm -f timempi timempi2
 	rm -f *.o
 	rm -f *~
