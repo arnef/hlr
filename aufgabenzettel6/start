@@ -1,4 +1,5 @@
 #!/bin/sh
 #SBATCH -N 4 -n 4
 #SBATCH --output=timepi.out
-mpiexec ./timempi
+mpiexec ./timempi2
+
