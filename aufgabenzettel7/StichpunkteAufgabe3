@@ -28,4 +28,39 @@ So werden auch die Daten immer am anfang jeder Iteration ausgetauscht.
 
 Parallelisierungsschema Gauß-Seidel:
 
-Hier handelt es sich um ein Verfahren das auf einer matrix arbeitet
+Hier handelt es sich um ein Verfahren das auf einer matrix arbeitet. Es geht auch
+reihenweise vor. Bei der initalisierung wird jedem Thread seine Reihe zugewiesen und
+Jeder Prozess sendet seinem Vorgänger die erste Reihe. (bis auf ThreadRang 0, da 
+dieser keinen Vorgänger besitzt)
+
+Danach fängt der Algorithmus in Reihe 1 an und geht iterativ durch alle durch.
+Daraus folgt das jeder thread (bei Rang0 beginnend) immer die letzte Reihe nach seiner
+Berechnung an seinen nachfolger schickt und und die erste an seinen Vorgänger. (Mit Rang 0 
+kann wieder beginnen sobald er von seinem Nachfolger die Reihe erhählt und muss auch 
+nur die letzte Reihe weitersenden. Rang n muss nur die erste zeile an seinen Vorgänger
+schicken wenn er seine Berechnung beendet hat.
+
+Der Clou hierbei ist. Die Vorgänger können immer schon anfangen sobald sie die Werte von ihrem
+Nachfolger erreichen.  obwohl die Iteration des Algorithmus noch nicht vollständig abgeschlossen ist.
+Es ist keine Synchronisation nötig um den Algorithmus forzuführen.
+
+Abbruch problematik:
+
+Jacobi
+
+Beide Abbruchbedingungen können nach der vollständigen Erstellung der Lösungsmatrix in jeder
+Iteration überprüft werden. Da sowohl dann eine überprüfung stattfinden kann ob die Iterationen
+vollständig abgeschlossen ist als auch das man eine Lösungsmatrix hat in der komplett geprüft werden kann
+ob alle Werte der Genauigkeit entsprechen. Die macht jeder Thread für seine Reihen und danach gibt es einen 
+weiteren Sync, das  entweder die Lösung den Abbrechbedingungen genügen oder eine weitere Iteration durch
+geführt werden muss.
+
+Gauß Seidel
+
+Die Abbruchbedingung der iterationsanzahl wird in Rang 0 geprüft und höhrt dann einfach auf wenn diese
+erfüllt sind.
+
+Bei der Abbruchbedingung der Genauigkeit is dies etwas schwieriger da wir ein Asynchrones verhalten haben.
+
+
+
