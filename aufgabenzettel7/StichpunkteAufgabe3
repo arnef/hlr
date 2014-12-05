@@ -1,0 +1,31 @@
+Prosabeschreibung der Datanaufteilung:
+  Die Matrix wird wie folgt aufgeteilt, da es sich um reihenbasierte
+verfahren handelt bekommt jeder Thread (Reihenanzahl / Threadanzahl)
+Reihen zugewiesen
+
+Parallelisierungsschema Jacobi:
+
+Bei Jacobi gilt es das von einer Matrix auf die nächste geschrieben wird.
+Jedes Feld der neuen Matrix benötigt die werte von der alten Matrix 
+die auf der gleichen Feld Position und die die um einen Index wert drum herum
+liegen. Sprich auch Werte wo die Zuständigkeit bei einem anderen Thread liegt.
+
+dem entsprechend müssen alle Threads ihre erste Reihe der ersten Matrix 
+dem Thread der im Rank vor ihnen liegt schicken und und ihre letzte Reihe dem
+Thread der im Rang nach ihnen liegt.
+
+Ausnahmen bilden hier Rang 0 und Rang n (Mit n der letzte Rang bei N Threads).
+Rang 0 hat keinen Vorgänger, somit muss er nur seine letzte Reihe an seinen
+Nachfolger schicken. Rang n hat keinen Nachfolger und muss somit nur seine
+erste Reihe an seinen Vorgänger schicken.
+
+nach jeder iteration (wenn alle Felder in Matrix 2 gefüllt sind) muss einmal
+gesynct werden sodas die reihen für die iteration dann von der Matrix 2 neu
+aufgeteilt werden. und Matrix 1 dann wieder mit den neuen ergebnissen befüllt
+werden kann.
+
+So werden auch die Daten immer am anfang jeder Iteration ausgetauscht.
+
+Parallelisierungsschema Gauß-Seidel:
+
+Hier handelt es sich um ein Verfahren das auf einer matrix arbeitet
