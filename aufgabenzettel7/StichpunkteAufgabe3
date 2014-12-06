@@ -1,5 +1,6 @@
 Prosabeschreibung der Datanaufteilung:
-  Die Matrix wird wie folgt aufgeteilt, da es sich um reihenbasierte
+
+Die Matrix wird wie folgt aufgeteilt, da es sich um reihenbasierte
 verfahren handelt bekommt jeder Thread (Reihenanzahl / Threadanzahl)
 Reihen zugewiesen
 
@@ -61,6 +62,10 @@ Die Abbruchbedingung der iterationsanzahl wird in Rang 0 geprüft und höhrt dan
 erfüllt sind.
 
 Bei der Abbruchbedingung der Genauigkeit is dies etwas schwieriger da wir ein Asynchrones verhalten haben.
+Da mehr iterationen das Ergenis vom Prinzip her nur noch genauer machen kann Thread Rang0 keine Iteration
+mehr anfangen wenn ihm alle anderen Threads zugesendet haben wenn sie genau genug sind und Thread 0 auch
+genau genug ist um der Genauigkeits bedingung zu genügen.
 
-
-
+Die letzte iteration läuft dann noch durch, damit alle Teilergebnisse aus der gleichen iteration kommen.
+Ob für einen Thread die Genauigkeitsbedingung ausreichend erfüllt is. prüft jeder Thread für sich nachdem
+ein neues Ergebnis errechnet hat.
