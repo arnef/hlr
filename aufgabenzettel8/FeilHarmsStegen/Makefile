@@ -10,17 +10,17 @@ OBJS = partdiff-mpi.o askparams.o
 
 # Rule to create *.o from *.c
 .c.o:
-	$(CC) -c $(CFLAGS) $*.c
+	mpicc -c $(CFLAGS) $*.c
 
 # Targets ...
-all: partdiff-seq
+all: partdiff-mpi
 
-partdiff-seq: $(OBJS) Makefile
-	$(CC) $(LFLAGS) -o $@ $(OBJS) $(LIBS)
+partdiff-mpi: $(OBJS) Makefile
+	mpicc $(LFLAGS) -o $@ $(OBJS) $(LIBS)
 
 clean:
 	$(RM) *.o *~
 
-partdiff-seq.o: partdiff-seq.c Makefile
+partdiff-mpi.o: partdiff-mpi.c Makefile
 
 askparams.o: askparams.c Makefile

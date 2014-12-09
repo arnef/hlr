@@ -16,6 +16,7 @@
 /* *********************************** */
 #include <math.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /* ************* */
 /* Some defines. */
@@ -52,4 +53,4 @@ struct options
 /* - askparams.c               */
 /* - displaymatrix.c           */
 /* *************************** */
-void AskParams (struct options*, int, char**);
+void AskParams (struct options*, int, char**, bool verbose);

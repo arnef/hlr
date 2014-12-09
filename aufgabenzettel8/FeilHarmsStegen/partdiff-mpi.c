@@ -26,6 +26,7 @@
 #include <math.h>
 #include <malloc.h>
 #include <sys/time.h>
+#include <assert.h>
 #undef __cplusplus
 #include <mpi/mpi.h>
 
@@ -35,8 +36,9 @@
 
 struct mpi_options
 {
-	int      mpi_size;       /* number of mpi processes                        */
-	int      mpi_rank;       /* rank of this process                           */
+	uint32_t mpi_size;       /* number of mpi processes                        */
+	uint32_t mpi_rank;       /* rank of this process                           */
+	uint32_t num_procs_used; /* number of mpi processes actually used          */
 	MPI_Comm comm;			 /* comm */
 };
 
@@ -78,43 +80,62 @@ initVariables (struct calculation_arguments* arguments, struct calculation_resul
 	arguments->num_matrices = (options->method == METH_JACOBI) ? 2 : 1;
 	arguments->h = 1.0 / arguments->N;
 
-	int num_processes_used;
 	if(options->method == METH_JACOBI)
 	{
 		// paralell
 		uint64_t N = arguments->N;
-		uint64_t rows_per_process = INTEGER_DIVISION_ROUNDING_UP(N, (uint32_t)mpi_options->mpi_size);
-		num_processes_used = INTEGER_DIVISION_ROUNDING_UP(N, rows_per_process);
+		if(N < mpi_options->num_procs_used)
+		{
+			mpi_options->num_procs_used = N;
+		}
+		uint64_t rows_per_process = (N-1)/mpi_options->num_procs_used;
+		uint64_t remaining_rows = (N-1) - mpi_options->num_procs_used * rows_per_process;
 		
-		if(mpi_options->mpi_rank < num_processes_used)
+		if(mpi_options->mpi_rank < mpi_options->num_procs_used)
 		{
 			uint64_t start = mpi_options->mpi_rank * rows_per_process;
+			start += (mpi_options->mpi_rank < remaining_rows)? mpi_options->mpi_rank : remaining_rows;
 			uint64_t end = start + rows_per_process;
-			if(start > N)
-				start = N;
-			if(end > N)
-				end = N;
-			arguments->row_start = start;
-			arguments->row_end = end;
+			end += (mpi_options->mpi_rank < remaining_rows)? 1:0;
+			assert(start <= end);
+			assert(end <= N);
+			arguments->row_start = start + 1;//1 is first index
+			arguments->row_end = end + 1;//1 is first index
 		}
 	}
 	else
 	{
 		// not parallel
-		num_processes_used = 1;
+		mpi_options->num_procs_used = 1;
 		if(mpi_options->mpi_rank == 0)
 		{
 			// calculate everything
-			arguments->row_start = 0;
+			arguments->row_start = 1;
 			arguments->row_end = arguments->N;
 		}
 	}
 
-	if(mpi_options->mpi_rank >= num_processes_used)
+	if(mpi_options->mpi_size > mpi_options->num_procs_used)
+	{
+		MPI_Group world_group;
+		MPI_Comm_group(MPI_COMM_WORLD, &world_group);
+
+		// create group with only necessary ranks
+		int ranks[3] = {0, mpi_options->num_procs_used-1, 1};
+		MPI_Group new_group;
+		MPI_Group_range_incl(world_group, 1, &ranks, &new_group);
+
+		// Create a new communicator
+		MPI_Comm_create(MPI_COMM_WORLD, new_group, &mpi_options->comm);
+	}
+
+	if(mpi_options->mpi_rank >= mpi_options->num_procs_used)
 	{	
 		// calculate nothing
-		arguments->row_start = 0;
-		arguments->row_end = 0;
+		//arguments->row_start = 0;
+		//arguments->row_end = 0;
+		MPI_Finalize();
+		exit(0);
 	}
 
 	results->m = 0;
@@ -170,20 +191,32 @@ allocateMatrices (struct calculation_arguments* arguments)
 	uint64_t i, j;
 
 	uint64_t const N = arguments->N;
+	uint64_t num_rows = arguments->row_end - arguments->row_start + 2;
 
 	//Mein Editor meckert über implizites Casten von void* nach foo* --> Explizite Casts hinzugefügt
-	arguments->M = (double*)allocateMemory(arguments->num_matrices * (N + 1) * (N + 1) * sizeof(double));
+	uint64_t buffer_length = arguments->num_matrices * num_rows * (N + 1) * sizeof(double);
+	arguments->M = (double*)allocateMemory((size_t)buffer_length);
 	arguments->Matrix = (double***)allocateMemory(arguments->num_matrices * sizeof(double**));
 
+	double* p = arguments->M;
 	for (i = 0; i < arguments->num_matrices; i++)
 	{
 		arguments->Matrix[i] = (double**)allocateMemory((N + 1) * sizeof(double*));
 
 		for (j = 0; j <= N; j++)
 		{
-			arguments->Matrix[i][j] = arguments->M + (i * (N + 1) * (N + 1)) + (j * (N + 1));
+			if(j+1 < arguments->row_start || j > arguments->row_end)
+			{
+				arguments->Matrix[i][j] = NULL;
+			}
+			else
+			{
+				arguments->Matrix[i][j] = p;
+				p += N+1;
+			}
 		}
 	}
+	assert(p <= arguments->M + buffer_length);
 }
 
 /* ************************************************************************ */
@@ -204,9 +237,12 @@ initMatrices (struct calculation_arguments* arguments, struct options const* opt
 	{
 		for (i = 0; i <= N; i++)
 		{
-			for (j = 0; j <= N; j++)
+			if(Matrix[g][i])
 			{
-				Matrix[g][i][j] = 0.0;
+				for (j = 0; j <= N; j++)
+				{
+					Matrix[g][i][j] = 0.0;
+				}
 			}
 		}
 	}
@@ -218,14 +254,14 @@ initMatrices (struct calculation_arguments* arguments, struct options const* opt
 		{
 			for (i = 0; i <= N; i++)
 			{
-				Matrix[g][i][0] = 1.0 - (h * i);
-				Matrix[g][i][N] = h * i;
-				Matrix[g][0][i] = 1.0 - (h * i);
-				Matrix[g][N][i] = h * i;
+				if(Matrix[g][i]) Matrix[g][i][0] = 1.0 - (h * i);
+				if(Matrix[g][i]) Matrix[g][i][N] = h * i;
+				if(Matrix[g][0]) Matrix[g][0][i] = 1.0 - (h * i);
+				if(Matrix[g][N]) Matrix[g][N][i] = h * i;
 			}
 
-			Matrix[g][N][0] = 0.0;
-			Matrix[g][0][N] = 0.0;
+			if(Matrix[g][N]) Matrix[g][N][0] = 0.0;
+			if(Matrix[g][0]) Matrix[g][0][N] = 0.0;
 		}
 	}
 }
@@ -235,15 +271,15 @@ initMatrices (struct calculation_arguments* arguments, struct options const* opt
 /* ************************************************************************ */
 static
 void
-calculate (struct calculation_arguments const* arguments, struct calculation_results *results, struct options const* options)
+calculate (struct calculation_arguments const* arguments, struct calculation_results *results, struct options const* options, struct mpi_options* mpi_options)
 {
-	int i, j;                                   /* local variables for loops  */
+	uint32_t i, j;                                   /* local variables for loops  */
 	int m1, m2;                                 /* used as indices for old and new matrices       */
 	double star;                                /* four times center value minus 4 neigh.b values */
 	double residuum;                            /* residuum of current iteration                  */
 	double maxresiduum;                         /* maximum residuum value of a slave in iteration */
 
-	int const N = arguments->N;
+	uint32_t const N = arguments->N;
 	double const h = arguments->h;
 
 	double pih = 0.0;
@@ -269,15 +305,19 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		fpisin = 0.25 * TWO_PI_SQUARE * h * h;
 	}
 
+	uint64_t start = arguments->row_start;
+	uint64_t end = arguments->row_end;
+
 	while (term_iteration > 0)
 	{
 		double** Matrix_Out = arguments->Matrix[m1];
 		double** Matrix_In  = arguments->Matrix[m2];
+		bool calculate_risiuum = options->termination == TERM_PREC || term_iteration == 1;
 
 		maxresiduum = 0;
 
 		/* over all rows */
-		for (i = 1; i < N; i++)
+		for (i = start; i < end; i++)
 		{
 			double fpisin_i = 0.0;
 
@@ -296,7 +336,7 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 					star += fpisin_i * sin(pih * (double)j);
 				}
 
-				if (options->termination == TERM_PREC || term_iteration == 1)
+				if (calculate_risiuum)
 				{
 					residuum = Matrix_In[i][j] - star;
 					residuum = (residuum < 0) ? -residuum : residuum;
@@ -305,6 +345,12 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 
 				Matrix_Out[i][j] = star;
 			}
+		}
+
+		if(calculate_risiuum && mpi_options->num_procs_used > 1)
+		{
+			double local_risiuum = maxresiduum;
+			MPI_Reduce(&local_risiuum, &maxresiduum, 1, MPI_DOUBLE, MPI_MAX, 0, mpi_options->comm);
 		}
 
 		results->stat_iteration++;
@@ -326,6 +372,37 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		else if (options->termination == TERM_ITER)
 		{
 			term_iteration--;
+		}
+		if(term_iteration > 0)
+		{
+			MPI_Request request1 = NULL;
+			MPI_Request request2 = NULL;
+
+			if(mpi_options->mpi_rank > 0)
+			{
+				// send to previous process
+				MPI_Isend(Matrix_Out[arguments->row_start], N, MPI_DOUBLE, mpi_options->mpi_rank-1, 1, mpi_options->comm, &request1);
+			}
+			if(mpi_options->mpi_rank+1 < mpi_options->num_procs_used)
+			{
+				// send to next process
+				MPI_Isend(Matrix_Out[arguments->row_end-1], N, MPI_DOUBLE, mpi_options->mpi_rank+1, 1, mpi_options->comm, &request2);
+			}
+
+
+			if(mpi_options->mpi_rank > 0)
+			{
+				// receive from previous process
+				MPI_Recv(Matrix_Out[arguments->row_start-1], N, MPI_DOUBLE, mpi_options->mpi_rank-1, 1, mpi_options->comm, NULL);
+			}
+			if(mpi_options->mpi_rank+1 < mpi_options->num_procs_used)
+			{
+				// receive from next process
+				MPI_Recv(Matrix_Out[arguments->row_end], N, MPI_DOUBLE, mpi_options->mpi_rank+1, 1, mpi_options->comm, NULL);
+			}
+			MPI_Status status;
+			if(request1) MPI_Wait(&request1, &status);
+			if(request2) MPI_Wait(&request2, &status);
 		}
 	}
 
@@ -437,7 +514,7 @@ DisplayMatrix (struct calculation_arguments* arguments, struct calculation_resul
       {
         /* if the line belongs to this process, send it to rank 0
          * (line - from + 1) is used to calculate the correct local address */
-        MPI_Send(Matrix[line - from + 1], elements, MPI_DOUBLE, 0, 42 + y, MPI_COMM_WORLD);
+        MPI_Send(Matrix[line], elements, MPI_DOUBLE, 0, 42 + y, MPI_COMM_WORLD);
       }
     }
 
@@ -513,13 +590,14 @@ initMpi(struct mpi_options* mpi_options, int* argc, char*** argv)
 	/* default values if mpi is not used */
 	mpi_options->mpi_rank = 0;
 	mpi_options->mpi_size = 1;
-	mpi_options->comm = MPI_COMM_WORLD;
 
 	/* initialize mpi */
 	MPI_Init(argc, argv);
-	MPI_Comm_rank (MPI_COMM_WORLD, &mpi_options->mpi_rank);
-	MPI_Comm_size (MPI_COMM_WORLD, &mpi_options->mpi_size);
-};
+	MPI_Comm_rank (MPI_COMM_WORLD, (int*)&mpi_options->mpi_rank);
+	MPI_Comm_size (MPI_COMM_WORLD, (int*)&mpi_options->mpi_size);
+	mpi_options->comm = MPI_COMM_WORLD;
+	mpi_options->num_procs_used = mpi_options->mpi_size;
+}
 
 /* ************************************************************************ */
 /*  main                                                                    */
@@ -534,7 +612,7 @@ main (int argc, char** argv)
 
 	initMpi(&mpi_options, &argc, &argv);
 	/* get parameters */
-	AskParams(&options, argc, argv);              /* ************************* */
+	AskParams(&options, argc, argv, mpi_options.mpi_rank == 0);              /* ************************* */
 
 	initVariables(&arguments, &results, &options, &mpi_options);           /* ******************************************* */
 
@@ -542,13 +620,14 @@ main (int argc, char** argv)
 	initMatrices(&arguments, &options);            /* ******************************************* */
 
 	gettimeofday(&start_time, NULL);                   /*  start timer         */
-	calculate(&arguments, &results, &options);                                      /*  solve the equation  */
+	calculate(&arguments, &results, &options, &mpi_options);                                      /*  solve the equation  */
 	gettimeofday(&comp_time, NULL);                   /*  stop timer          */
 
-	displayStatistics(&arguments, &results, &options);
+	if(mpi_options.mpi_rank == 0) displayStatistics(&arguments, &results, &options);
 	DisplayMatrix(&arguments, &results, &options, mpi_options.mpi_rank, mpi_options.mpi_size, arguments.row_start, arguments.row_end);
 
 	freeMatrices(&arguments);                                       /*  free memory     */
 
+	MPI_Finalize();
 	return 0;
 }
