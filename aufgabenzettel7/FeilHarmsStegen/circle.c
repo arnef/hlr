@@ -90,7 +90,6 @@ main (int argc, char** argv)
   MPI_Comm_rank (MPI_COMM_WORLD, &mpi_rank);
   MPI_Comm_size (MPI_COMM_WORLD, &mpi_size);
 
-
   srand(time(NULL) - mpi_rank);
 
   if ((argc-1) != 1)//argv[0] ist das Programm selbst
@@ -115,6 +114,11 @@ main (int argc, char** argv)
     printf("Argument is too small: %d\n",N);
     return EXIT_FAILURE;
   }
+
+  //Sendepuffer ausreichend vergrößern
+  int send_buffer_size = 1024 + 4*N;
+  void* send_buffer = malloc(send_buffer_size);
+  MPI_Buffer_attach(send_buffer, send_buffer_size);
 
   //Ausrechnen, wie die Elemente verteilt werden:
   int stride = INTEGER_DIVISION_ROUNDING_UP(N, mpi_size); //Maximale Anzahl an Elementen pro Prozess
