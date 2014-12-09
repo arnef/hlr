@@ -232,7 +232,7 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		maxresiduum = 0;
 
 		/* over all rows */
-		for (i = 1; i < N; i++)
+		for (i = 1; i < process_used_rows-1; i++)
 		{
 			double fpisin_i = 0.0;
 
@@ -261,10 +261,43 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 				Matrix_Out[i][j] = star;
 			}
 		}
+		/*  Austausch der Reihen */
+		if (rank == 0)
+		{
+			MPI_Ssend(message,rank+1,)
+			Matrix_ln[process_used_rows-1]=MPI_Recv(receviedMessage,rank+1)
 
+		}
+		else { 
+			if (rank%2 == 1)
+				{
+				if (rank != size)
+					{
+					message = Matrix_Out[process_used_rows-1] 
+					Matrix_Out[process_used_rows-1] = MPI_Recv(receviedMessage,rank+1)
+					MPI_Ssend(message,rank+1,)							
+					}
+				message = Matrix_Out[0]
+				Matrix_Out[0] = MPI_Recv(receviedMessage,rank-1)
+				MPI_Ssend(message,rank-1,)
+				}
+			else{
+				message = Matrix_Out[0] 
+				MPI_Ssend(message,rank-1,)
+				row[0] = MPI_Recv(receviedMessage,rank-1)
+				if (rank != size)
+					{
+					message = Matrix_Out[process_used_rows-1] 
+					MPI_Ssend(message,rank+1,)
+					row[process_used_rows-1] = MPI_Recv(receviedMessage,rank+1)
+					}
+				}
+			}
 		results->stat_iteration++;
 		results->stat_precision = maxresiduum;
 
+		/* Abruchbedingungen */
+		
 		/* exchange m1 and m2 */
 		i = m1;
 		m1 = m2;
