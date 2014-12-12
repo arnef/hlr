@@ -83,7 +83,7 @@ initVariables (struct calculation_arguments* arguments, struct calculation_resul
 
 	if(options->method == METH_JACOBI)
 	{
-		// paralell
+		// paralell assign rows to the processes
 		uint64_t N = arguments->N;
 		if(N < mpi_options->num_procs_used)
 		{
@@ -92,8 +92,9 @@ initVariables (struct calculation_arguments* arguments, struct calculation_resul
 		uint64_t rows_per_process = (N-1)/mpi_options->num_procs_used;
 		uint64_t remaining_rows = (N-1) - mpi_options->num_procs_used * rows_per_process;
 		
+		// calculate how many rows each process gets
 		if(mpi_options->mpi_rank < mpi_options->num_procs_used)
-		{
+		{	
 			uint64_t start = mpi_options->mpi_rank * rows_per_process;
 			start += (mpi_options->mpi_rank < remaining_rows)? mpi_options->mpi_rank : remaining_rows;
 			uint64_t end = start + rows_per_process;
@@ -318,7 +319,7 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 
 		maxresiduum = 0;
 
-		/* over all rows */
+		/* over all rows of the process*/
 		for (i = start; i < end; i++)
 		{
 			double fpisin_i = 0.0;
@@ -395,28 +396,32 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		{
 			term_iteration--;
 		}
+		// Sending the rows needed by other processes
 		if(term_iteration > 0)
 		{
 			MPI_Request request1 = NULL;
 			MPI_Request request2 = NULL;
-
+			
+			// Rank 0 has no previous process
 			if(mpi_options->mpi_rank > 0)
 			{
-				// send to previous process
+				// send to previous process and using Isend for non blocking sendoperation to avoid deadlock
 				MPI_Isend(Matrix_Out[arguments->row_start], N, MPI_DOUBLE, mpi_options->mpi_rank-1, 1, mpi_options->comm, &request1);
 			}
+			// the last process has no following process
 			if(mpi_options->mpi_rank+1 < mpi_options->num_procs_used)
 			{
-				// send to next process
+				// send to next process and using Isend for non blocking sendoperation to avoid deadlock
 				MPI_Isend(Matrix_Out[arguments->row_end-1], N, MPI_DOUBLE, mpi_options->mpi_rank+1, 1, mpi_options->comm, &request2);
 			}
 
-
+			// Rank 0 has no previous process
 			if(mpi_options->mpi_rank > 0)
 			{
 				// receive from previous process
 				MPI_Recv(Matrix_Out[arguments->row_start-1], N, MPI_DOUBLE, mpi_options->mpi_rank-1, 1, mpi_options->comm, NULL);
 			}
+			// the last process has no following process
 			if(mpi_options->mpi_rank+1 < mpi_options->num_procs_used)
 			{
 				// receive from next process
