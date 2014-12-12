@@ -368,6 +368,9 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		/* check for stopping calculation, depending on termination method */
 		if (options->termination == TERM_PREC)
 		{
+			/*
+			* Broadcast, ob Abbruch erfüllt ist oder nicht.
+			*/
 			if (mpi_options->num_procs_used > 1) {
 				if (mpi_options->mpi_rank == 0) {
 					if (global_maxresiduum[0] < options->term_precision)
@@ -379,6 +382,9 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 				}
 				MPI_Bcast(&term_iteration, 1, MPI_INT, 0, mpi_options->comm); 
 			}
+			/*
+			* Bei einem Prozess brauchen wir keinen Broadcast (alter Code)
+			*/
 			else {
 				if (maxresiduum < options->term_precision) {
 					term_iteration = 0;
