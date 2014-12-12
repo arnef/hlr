@@ -30,7 +30,7 @@
 #undef __cplusplus
 #include <mpi/mpi.h>
 
-#include "partdiff-mpi.h"
+#include "partdiff-par.h"
 
 #define INTEGER_DIVISION_ROUNDING_UP(dividend, divisor) (((dividend)+(divisor)-1)/(divisor))
 
