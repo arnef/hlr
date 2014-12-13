@@ -67,7 +67,6 @@ struct calculation_results
 /* time measurement variables */
 struct timeval start_time;       /* time when program started                      */
 struct timeval comp_time;        /* time when calculation completed                */
-double global_maxresiduum[1];
 
 
 /* ************************************************************************ */
@@ -352,8 +351,9 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 
 		if(calculate_risiuum && mpi_options->num_procs_used > 1)
 		{
-//			double local_risiuum = maxresiduum;
-			MPI_Reduce(&maxresiduum, global_maxresiduum, 1, MPI_DOUBLE, MPI_MAX, 0, mpi_options->comm);
+			//assign global residuum to maxresiduum
+			double local_risiuum = maxresiduum;
+			MPI_Allreduce(&local_risiuum, &maxresiduum, 1, MPI_DOUBLE, MPI_MAX, mpi_options->comm);
 			
 		}
 		
@@ -369,27 +369,9 @@ calculate (struct calculation_arguments const* arguments, struct calculation_res
 		/* check for stopping calculation, depending on termination method */
 		if (options->termination == TERM_PREC)
 		{
-			/*
-			* Broadcast, ob Abbruch erfüllt ist oder nicht.
-			*/
-			if (mpi_options->num_procs_used > 1) {
-				if (mpi_options->mpi_rank == 0) {
-					if (global_maxresiduum[0] < options->term_precision)
-					{
-						term_iteration = 0;
-						results->stat_precision = global_maxresiduum[0];
-					}
-
-				}
-				MPI_Bcast(&term_iteration, 1, MPI_INT, 0, mpi_options->comm); 
-			}
-			/*
-			* Bei einem Prozess brauchen wir keinen Broadcast (alter Code)
-			*/
-			else {
-				if (maxresiduum < options->term_precision) {
-					term_iteration = 0;
-				}			
+			if (maxresiduum < options->term_precision)
+			{
+				term_iteration = 0;
 			}
 		}
 		else if (options->termination == TERM_ITER)
@@ -636,7 +618,7 @@ main (int argc, char** argv)
 	struct mpi_options mpi_options;
 	struct calculation_arguments arguments;
 	struct calculation_results results;
-		global_maxresiduum[0] = 0;
+	
 	initMpi(&mpi_options, &argc, &argv);
 	/* get parameters */
 	AskParams(&options, argc, argv, mpi_options.mpi_rank == 0);              /* ************************* */
