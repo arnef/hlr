@@ -289,7 +289,7 @@ wait_for_completion(MPI_Request* request)
 }
 
 /* ************************************************************************ */
-/* calculate: solves the equation using the jacobi method                   */
+/* calculate: solves the equation using the gauss method                   */
 /* ************************************************************************ */
 static
 void
@@ -331,6 +331,8 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 	bool is_first_iteration = true;
 	bool is_precision_sufficcient = false;
 
+  // checking for termination by precissionflag is set in the last process for
+  // absolute termination
 	if(options->termination == TERM_PREC && mpi_options->num_procs_used > 1 && IS_FIRST(mpi_options))
 	{
 		MPI_Irecv(&is_precision_sufficcient, 1, MPI_C_BOOL, LAST_RANK(mpi_options), end_tag, mpi_options->comm, &receive_precision_notification);
@@ -346,11 +348,14 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 
 		if(mpi_options->num_procs_used > 1)
 		{
-			if(options->termination == TERM_PREC)
+			// looking if the previous rank has set the precission sufficient flag
+      if(options->termination == TERM_PREC)
 			{
 				if(!IS_FIRST(mpi_options))
-				{
-					MPI_Recv(&is_precision_sufficcient, 1,       MPI_C_BOOL, PREVIOUS_RANK(mpi_options), end_tag, mpi_options->comm, NULL);
+				{ 
+          // only can recive the flag when the privious rank has a sufficiant
+          // precission
+					MPI_IRecv(&is_precision_sufficcient, 1, MPI_C_BOOL, PREVIOUS_RANK(mpi_options), end_tag, mpi_options->comm, NULL);
 				}
 				else
 				{
@@ -362,6 +367,8 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 						wait_for_completion(&receive_precision_notification);
 					}
 				}
+        // when the precission is sufficcient in the last iteration send the
+        // flag to the next rank
 				if(is_precision_sufficcient)
 				{
 					if(mpi_options->mpi_rank +1 < mpi_options->num_procs_used)
@@ -378,11 +385,12 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 
 			if(!is_first_iteration && !IS_LAST(mpi_options))
 			{
-				// receive last rMPI_Testow from next process
+				// receive last own row from the next process
 				MPI_Irecv(Matrix_In[arguments->row_end], N+1, MPI_DOUBLE, NEXT_RANK(mpi_options), 1, mpi_options->comm, &receiving_last_row_from_next);
 				//MPI_Recv(Matrix_In[arguments->row_end], N+1, MPI_DOUBLE, NEXT_RANK(mpi_options), 1, mpi_options->comm, NULL);
 			}
-
+      
+      // wait until the the following process did send the whole row
 			wait_for_completion(&sending_first_row_to_previous);
 		}
 
