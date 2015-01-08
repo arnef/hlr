@@ -311,17 +311,9 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 
 	int term_iteration = options->term_iteration;
 
-	/* initialize m1 and m2 depending on algorithm */
-	if (options->method == METH_JACOBI)
-	{
-		m1 = 0;
-		m2 = 1;
-	}
-	else
-	{
+	/* initialize m1 and m2 for gauss */
 		m1 = 0;
 		m2 = 0;
-	}
 
 	if (options->inf_func == FUNC_FPISIN)
 	{
@@ -539,17 +531,9 @@ calculate_jacobi (struct calculation_arguments const* arguments, struct calculat
 
 	int term_iteration = options->term_iteration;
 
-	/* initialize m1 and m2 depending on algorithm */
-	if (options->method == METH_JACOBI)
-	{
+	/* initialize m1 and m2 for jacobi */
 		m1 = 0;
 		m2 = 1;
-	}
-	else
-	{
-		m1 = 0;
-		m2 = 0;
-	}
 
 	if (options->inf_func == FUNC_FPISIN)
 	{
