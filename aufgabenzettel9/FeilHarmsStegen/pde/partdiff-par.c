@@ -355,7 +355,7 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 				{ 
           // only can recive the flag when the privious rank has a sufficiant
           // precission
-					MPI_IRecv(&is_precision_sufficcient, 1, MPI_C_BOOL, PREVIOUS_RANK(mpi_options), end_tag, mpi_options->comm, NULL);
+					MPI_Recv(&is_precision_sufficcient, 1, MPI_C_BOOL, PREVIOUS_RANK(mpi_options), end_tag, mpi_options->comm, NULL);
 				}
 				else
 				{
