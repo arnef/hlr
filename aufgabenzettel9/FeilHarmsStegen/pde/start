@@ -1,4 +1,0 @@
-#!/bin/sh  
-#SBATCH --output=mpi.out -N 2 -n 24 
-mpiexec ./partdiff-par 1 1 512 2 2 100
-#mpiexec ./partdiff-par 1 1 512 2 1 2.9298e-7

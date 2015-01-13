@@ -289,7 +289,7 @@ wait_for_completion(MPI_Request* request)
 }
 
 /* ************************************************************************ */
-/* calculate: solves the equation using the jacobi method                   */
+/* calculate: solves the equation using the gauss method                   */
 /* ************************************************************************ */
 static
 void
@@ -331,6 +331,8 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 	bool is_first_iteration = true;
 	bool is_precision_sufficcient = false;
 
+  	// checking for termination by precissionflag is set in the last process for
+	// absolute termination
 	if(options->termination == TERM_PREC && mpi_options->num_procs_used > 1 && IS_FIRST(mpi_options))
 	{
 		MPI_Irecv(&is_precision_sufficcient, 1, MPI_C_BOOL, LAST_RANK(mpi_options), end_tag, mpi_options->comm, &receive_precision_notification);
@@ -346,11 +348,14 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 
 		if(mpi_options->num_procs_used > 1)
 		{
-			if(options->termination == TERM_PREC)
+			// looking if the previous rank has set the precission sufficient flag
+      			if(options->termination == TERM_PREC)
 			{
 				if(!IS_FIRST(mpi_options))
-				{
-					MPI_Recv(&is_precision_sufficcient, 1,       MPI_C_BOOL, PREVIOUS_RANK(mpi_options), end_tag, mpi_options->comm, NULL);
+				{ 
+          				// only can recive the flag when the privious rank has a sufficiant
+          				// precision
+					MPI_Recv(&is_precision_sufficcient, 1, MPI_C_BOOL, PREVIOUS_RANK(mpi_options), end_tag, mpi_options->comm, NULL);
 				}
 				else
 				{
@@ -362,6 +367,9 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 						wait_for_completion(&receive_precision_notification);
 					}
 				}
+			        // when the precission is sufficcient in the last iteration send the
+			        // flag to the next rank; and terminate after sending that the
+			        // programm can terminate
 				if(is_precision_sufficcient)
 				{
 					if(mpi_options->mpi_rank +1 < mpi_options->num_procs_used)
@@ -371,18 +379,18 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 			}
 			if(!IS_FIRST(mpi_options))
 			{
-				// first own row from previous
+				// first own row and maxresidium (when residuum is calculated ) from previous 
 				if(calculate_risiuum) MPI_Recv(&maxresiduum , 1, MPI_DOUBLE, PREVIOUS_RANK(mpi_options), 2, mpi_options->comm, NULL);
 				MPI_Recv(Matrix_In[arguments->row_start-1], N+1, MPI_DOUBLE, PREVIOUS_RANK(mpi_options), 1, mpi_options->comm, NULL);
 			}
 
 			if(!is_first_iteration && !IS_LAST(mpi_options))
 			{
-				// receive last rMPI_Testow from next process
+				// receive last own row from the next process
 				MPI_Irecv(Matrix_In[arguments->row_end], N+1, MPI_DOUBLE, NEXT_RANK(mpi_options), 1, mpi_options->comm, &receiving_last_row_from_next);
-				//MPI_Recv(Matrix_In[arguments->row_end], N+1, MPI_DOUBLE, NEXT_RANK(mpi_options), 1, mpi_options->comm, NULL);
 			}
-
+      
+      			// wait until the the following process did send the whole row
 			wait_for_completion(&sending_first_row_to_previous);
 		}
 
@@ -404,6 +412,7 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 			}
 
 			/* over all columns */
+			// calcualting the part of the matrix in each process
 			for (j = 1; j < N; j++)
 			{
 				star = 0.25 * (Matrix_In[i-1][j] + Matrix_In[i][j-1] + Matrix_In[i][j+1] + Matrix_In[i+1][j]);
@@ -427,8 +436,7 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 			{
 				// send to previous process and using Isend for non blocking sendoperation to avoid deadlock
 				MPI_Isend(Matrix_Out[arguments->row_start], N+1, MPI_DOUBLE, PREVIOUS_RANK(mpi_options), 1, mpi_options->comm, &sending_first_row_to_previous);
-				//MPI_Bsend(Matrix_Out[arguments->row_start], N+1, MPI_DOUBLE, PREVIOUS_RANK(mpi_options), 1, mpi_options->comm);
-			
+
 			}
 		}
 
@@ -441,6 +449,8 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 		m2 = i;
 
 		/* check for stopping calculation, depending on termination method */
+		
+		// termination after precision
 		if (options->termination == TERM_PREC)
 		{
 			if(IS_LAST(mpi_options))
@@ -464,6 +474,7 @@ calculate_gauss (struct calculation_arguments const* arguments, struct calculati
 				MPI_Send(&v, 1, MPI_C_BOOL, NEXT_RANK(mpi_options), end_tag, mpi_options->comm);
 			}
 		}
+		// termination with iterations
 		else if (options->termination == TERM_ITER)
 		{
 			term_iteration--;
